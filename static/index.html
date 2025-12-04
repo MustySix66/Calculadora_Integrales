@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Configuración básica del documento -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Metadatos de SEO -->
+    <title>Calculadora de Integrales | Visualización en Tiempo Real</title>
+    <meta name="description" content="Calculadora web de integrales con visualización gráfica en tiempo real usando SymPy y Plotly">
+    
+    <!-- Estilos CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Fuentes de Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Fondo animado con gradiente -->
+    <div class="background-gradient"></div>
+    
+    <!-- ========== HEADER ========== -->
+    <header>
+        <div class="container">
+            <h1>
+                <span class="integral-symbol">∫</span>
+                Calculadora Magica UwU
+            </h1>
+        </div>
+    </header>
+
+    <!-- ========== CONTENIDO PRINCIPAL ========== -->
+    <main class="container">
+        <!-- Grid de 2 columnas para los paneles de entrada y resultados -->
+        <div class="grid">
+            
+            <!-- ========== PANEL DE ENTRADA ========== -->
+            <!-- Aquí el usuario ingresa la función y los parámetros -->
+            <section class="card input-panel">
+                <h2>Configuración</h2>
+                
+                <!-- Campo de función matemática -->
+                <div class="form-group">
+                    <label for="function-input">Función f(x)</label>
+                    <input 
+                        type="text" 
+                        id="function-input" 
+                        placeholder="Ej: x**2 + 2*x"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                    <small class="hint">Usa sintaxis Python: ** para potencias, * para multiplicación</small>
+                </div>
+
+                <!-- Fila de 3 campos: variable, límite inferior, límite superior -->
+                <div class="form-row">
+                    <!-- Variable de integración -->
+                    <div class="form-group">
+                        <label for="variable-input">Variable</label>
+                        <input 
+                            type="text" 
+                            id="variable-input" 
+                            value="x"
+                            maxlength="1"
+                        >
+                    </div>
+
+                    <!-- Límite inferior (opcional, para integrales definidas) -->
+                    <div class="form-group">
+                        <label for="lower-limit">Límite inferior</label>
+                        <input 
+                            type="text" 
+                            id="lower-limit" 
+                            placeholder="opcional"
+                        >
+                    </div>
+
+                    <!-- Límite superior (opcional, para integrales definidas) -->
+                    <div class="form-group">
+                        <label for="upper-limit">Límite superior</label>
+                        <input 
+                            type="text" 
+                            id="upper-limit" 
+                            placeholder="opcional"
+                        >
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="button-group">
+                    <button id="calculate-btn" class="btn btn-primary">
+                        <span class="btn-icon">∫</span>
+                        Calcular
+                    </button>
+                    <button id="clear-btn" class="btn btn-secondary">
+                        Limpiar
+                    </button>
+                </div>
+
+                <!-- Botones de ejemplos precargados -->
+                <!-- Cada botón tiene el atributo data-function con la función a insertar -->
+                <div class="examples">
+                    <h3>Ejemplos</h3>
+                    <div class="example-grid">
+                        <button class="example-btn" data-function="x**6 + 2*x**3 - 5">x⁶ + 2x³ - 5</button>
+                        <button class="example-btn" data-function="x**5 - 3*x**2 + x">x⁵ - 3x² + x</button>
+                        <button class="example-btn" data-function="x**4 + x**3 - x**2 + 1">x⁴ + x³ - x² + 1</button>
+                        <button class="example-btn" data-function="2*x**3 - 5*x + 7">2x³ - 5x + 7</button>
+                        <button class="example-btn" data-function="x**7 + x**4 - 2*x">x⁷ + x⁴ - 2x</button>
+                        <button class="example-btn" data-function="3*x**4 - 6*x**2 + 2*x - 1">3x⁴ - 6x² + 2x - 1</button>
+                        <button class="example-btn" data-function="x**5 + 4*x**3 - 8">x⁵ + 4x³ - 8</button>
+                        <button class="example-btn" data-function="x**6 - x**4 + x**2 - 3">x⁶ - x⁴ + x² - 3</button>
+                        <button class="example-btn" data-function="5*x**3 + 2*x**2 - x">5x³ + 2x² - x</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== PANEL DE RESULTADOS ========== -->
+            <!-- Muestra la integral calculada y su valor numérico (si aplica) -->
+            <section class="card results-panel">
+                <h2>Resultados</h2>
+                
+                <!-- Spinner de carga (oculto por defecto) -->
+                <div id="loading" class="loading hidden">
+                    <div class="spinner"></div>
+                    <p>Calculando...</p>
+                </div>
+
+                <!-- Mensaje de error (oculto por defecto) -->
+                <div id="error-message" class="error-message hidden"></div>
+
+                <!-- Contenedor de resultados (oculto hasta que haya resultados) -->
+                <div id="results" class="hidden">
+                    <!-- Resultado de la integral simbólica -->
+                    <div class="result-item">
+                        <h3>Integral</h3>
+                        <div id="integral-result" class="math-result"></div>
+                    </div>
+
+                    <!-- Resultado de la integral definida (solo si hay límites) -->
+                    <div id="definite-result" class="result-item hidden">
+                        <h3>Valor de la integral definida</h3>
+                        <div id="definite-value" class="numeric-result"></div>
+                    </div>
+                </div>
+
+                <!-- Estado vacío (se muestra cuando no hay función ingresada) -->
+                <div id="empty-state" class="empty-state">
+                    <div class="empty-icon">∫</div>
+                    <p>Ingresa una función para ver los resultados</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- ========== PANEL DE GRÁFICA ========== -->
+        <!-- Ocupa todo el ancho debajo de los paneles anteriores -->
+        <section class="card graph-panel">
+            <h2>Visualización</h2>
+            <!-- Contenedor donde Plotly renderizará la gráfica interactiva -->
+            <div id="plot" class="plot-container"></div>
+        </section>
+    </main>
+
+    <!-- ========== FOOTER ========== -->
+    <footer>
+        <div class="container">
+            <p>Desarrollado con estres y red bull | &copy; 2025</p>
+        </div>
+    </footer>
+
+    <!-- ========== SCRIPTS ========== -->
+    <!-- Librería Plotly.js para gráficas interactivas -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <!-- Script principal de la aplicación -->
+    <script src="js/app.js"></script>
+</body>
+</html>
