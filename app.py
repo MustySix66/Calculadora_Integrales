@@ -190,7 +190,11 @@ def calculate():
 # Punto de entrada principal
 if __name__ == '__main__':
     # Ejecutar el servidor Flask
-    # debug=True: modo desarrollo (recarga automática al cambiar código)
-    # port=5000: puerto en el que escucha el servidor
-    app.run(debug=True, port=5000)
+    # En producción (Render), gunicorn manejará esto
+    # En desarrollo local, Flask lo ejecuta directamente
+    # host='0.0.0.0': Permite conexiones desde cualquier IP (necesario para Render)
+    # port=5000: Puerto por defecto
+    # debug=True: Modo desarrollo (recarga automática al cambiar código)
+    app.run(host='0.0.0.0', debug=True, port=5000)
+
 
