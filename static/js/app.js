@@ -139,8 +139,14 @@ function displayResults(result) {
     hideError();
     hideEmptyState();
 
-    // Mostrar la integral en formato texto
-    integralResult.textContent = result.integral_text;
+    // Mostrar la integral en formato LaTeX usando MathJax
+    // Envolver en delimitadores de MathJax: \[ ... \]
+    integralResult.innerHTML = '\\[' + result.integral + '\\]';
+
+    // Indicar a MathJax que renderice el nuevo contenido
+    if (window.MathJax) {
+        MathJax.typesetPromise([integralResult]).catch((err) => console.log('MathJax error:', err));
+    }
 
     // Si hay un valor de integral definida, mostrarlo
     if (result.definite_value !== null) {
